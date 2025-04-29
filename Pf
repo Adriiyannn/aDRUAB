@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ordering Kiosk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f1f5f9;
+      color: #333;
+    }
+
+    h1, h3, p, button, .item-info, .summary, .menu-item {
+      font-size: 18px;
+      font-weight: 400;
+    }
+    #welcomeScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(45deg, #df4444, #e63427);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 1000;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+
+    #welcomeScreen img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 30px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    #welcomeScreen h1 {
+      font-size: 36px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    #startBtn {
+      font-size: 24px;
+      padding: 18px 36px;
+      background-color: red;
+      border: none;
+      border-radius: 25px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #startBtn:hover {
+      background-color: #ff5d5d;
+    }
+
+    header {
+      background-color: rgb(212, 59, 59);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-placeholder {
+      width: 50px;
+      height: 50px;
+      background-color: #ddd;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .logo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    header h1 {
+      font-size: 28px;
+      color: white;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+
+    .sidebar {
+      width: 230px;
+      background-color: #ff9a8b;
+      padding: 30px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar button {
+      padding: 15px;
+      font-size: 20px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: white;
+      color: #333;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar button:hover {
+      background-color: #ff5d5d;
+      color: white;
+    }
+
+    .menu-content {
+      flex: 1;
+      padding: 30px;
+      background-color: #f9f9f9;
+      overflow-y: auto;
+    }
+
+    .menu-section {
+      display: none;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .menu-section.active {
+      display: flex;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .menu-item:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .item-img {
+      width: 90px;
+      height: 90px;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      margin-right: 20px;
+    }
+
+    .item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .item-info {
+      flex: 1;
+      font-size: 16px;
+    }
+
+    .item-action button {
+      background-color: #ff9a8b;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .item-action button:hover {
+      background-color: #ff5d5d;
+    }
+
+    .summary {
+      background-color: #ff9a8b;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-buttons button {
+      background-color: #ff5d5d;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 20px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .summary-buttons button:hover {
+      background-color: #ff9a8b;
+    }
+
+    #paymentOptions {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 999;
+      min-width: 300px;
+    }
+
+    #paymentOptions button {
+      display: block;
+      width: 100%;
+      margin: 15px 0;
+      padding: 12px;
+      background-color: #ff9a8b;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #paymentOptions button:hover {
+      background-color: #d12525;
+    }
+
+    #receiptPopup {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: none;
+      z-index: 1000;
+      min-width: 300px;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+  </style>
+</head>
+<body>
+    <div id="welcomeScreen">
+        <img id="welcomeImage" src="Logo.png" alt="Welcome Image" />
+        <h1>Welcome to The JAB House</h1>
+        <button id="startBtn" onclick="startOrder()">Tap to Start</button>
+      </div>
+
+
+  <header>
+    <div class="logo-title">
+      <div class="logo-placeholder">
+        <img src="Logo.png" alt="Logo" />
+      </div>
+      <h1>The JAB House</h1>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <button onclick="showMenu('quality')">Quality Meals</button>
+      <button onclick="showMenu('drinks')">Drinks</button>
+      <button onclick="showMenu('dessert')">Dessert</button>
+    </div>
+
+    <div class="menu-content">
+      <div id="quality" class="menu-section active">
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="fried chicken.png" alt="Fried Chicken Combo" />
+          </div>
+          <div class="item-info"><strong>Fried Chicken Combo</strong><br>₱150</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Fried Chicken Combo', 150)">Add</button>
+            <button onclick="removeFromOrder('Fried Chicken Combo')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="burgervsadrian.png" alt="Burger" />
+          </div>
+          <div class="item-info"><strong>Burger</strong><br>₱120</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Burger', 120)">Add</button>
+            <button onclick="removeFromOrder('Burger')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="burger steak.png" alt="Beef Steak" />
+          </div>
+          <div class="item-info"><strong>Beef Steak</strong><br>₱250</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Beef Steak', 250)">Add</button>
+            <button onclick="removeFromOrder('Beef Steak')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="fish fillet.png" alt="Fish Fillet" />
+          </div>
+          <div class="item-info"><strong>Fish Fillet</strong><br>₱180</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Fish Fillet', 180)">Add</button>
+            <button onclick="removeFromOrder('Fish Fillet')">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="drinks" class="menu-section">
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="coke.png" alt="Coke" />
+          </div>
+          <div class="item-info"><strong>Coke</strong><br>₱50</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Coke', 50)">Add</button>
+            <button onclick="removeFromOrder('Coke')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="sprite.png" alt="Sprite" />
+          </div>
+          <div class="item-info"><strong>Sprite</strong><br>₱50</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Sprite', 50)">Add</button>
+            <button onclick="removeFromOrder('Sprite')">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="dessert" class="menu-section">
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="salad.png" alt="Salad" />
+          </div>
+          <div class="item-info"><strong>Salad</strong><br>₱80</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Salad', 80)">Add</button>
+            <button onclick="removeFromOrder('Salad')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="ice cream (1).png" alt="Ice Cream" />
+          </div>
+          <div class="item-info"><strong>Ice Cream</strong><br>₱60</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Ice Cream', 60)">Add</button>
+            <button onclick="removeFromOrder('Ice Cream')">Remove</button>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="item-img">
+            <img src="grilled pork (1).png" alt="Grilled Pork" />
+          </div>
+          <div class="item-info"><strong>Grilled Pork</strong><br>₱220</div>
+          <div class="item-action">
+            <button onclick="addToOrder('Grilled Pork', 220)">Add</button>
+            <button onclick="removeFromOrder('Grilled Pork')">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <h3>Order Summary</h3>
+    <div id="orderList"></div>
+    <p><strong>Total:</strong> ₱<span id="total">0</span></p>
+    <div class="summary-buttons">
+      <button onclick="cancelOrder()">Cancel Order</button>
+      <button onclick="showPaymentOptions()">Pay Order</button>
+    </div>
+  </div>
+
+  <div id="paymentOptions">
+    <h3>Select Payment Method</h3>
+    <button onclick="payOrder('GCash')">Pay with GCash</button>
+    <button onclick="payOrder('Card')">Pay with Debit/Card</button>
+    <button onclick="payOrder('Cash')">Pay with Cash</button>
+  </div>
+
+  <div id="receiptPopup"></div>
+
+  <script>
+    let order = [];
+    function startOrder() { document.getElementById('welcomeScreen').style.display = 'none'; }
+    function showMenu(category) {
+      document.querySelectorAll('.menu-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(category).classList.add('active');
+    }
+    function addToOrder(name, price) {
+      const existing = order.find(item => item.name === name);
+      if (existing) { existing.quantity++; }
+      else { order.push({ name, price, quantity: 1 }); }
+      updateOrder();
+    }
+    function removeFromOrder(name) {
+      const index = order.findIndex(item => item.name === name);
+      if (index !== -1) {
+        if (order[index].quantity > 1) { order[index].quantity--; }
+        else { order.splice(index, 1); }
+      }
+      updateOrder();
+    }
+    function cancelOrder() { order = []; updateOrder(); }
+    function updateOrder() {
+      const orderList = document.getElementById('orderList');
+      orderList.innerHTML = '';
+      let total = 0;
+      order.forEach(item => {
+        const line = document.createElement('p');
+        line.textContent = `${item.quantity}x ${item.name} - ₱${item.price * item.quantity}`;
+        orderList.appendChild(line);
+        total += item.price * item.quantity;
+      });
+      document.getElementById('total').textContent = total;
+    }
+    function showPaymentOptions() {
+      if (order.length === 0) { alert("Please add items to your order first."); return; }
+      document.getElementById('paymentOptions').style.display = 'block';
+    }
+    function payOrder(method) {
+      document.getElementById('paymentOptions').style.display = 'none';
+      let receipt = `<h3>Thank you for your order!</h3><p>Payment Method: <strong>${method}</strong></p><ul>`;
+      order.forEach(item => { receipt += `<li>${item.name} - ₱${item.price * item.quantity}</li>`; });
+      receipt += `</ul><p><strong>Total: ₱${document.getElementById('total').textContent}</strong></p>`;
+      receipt += `<button onclick="closeReceipt()" style="margin-top: 15px; padding: 10px 20px; background-color: #ff9a8b; border: none; border-radius: 8px; cursor: pointer;">Close</button>`;
+      document.getElementById('receiptPopup').innerHTML = receipt;
+      document.getElementById('receiptPopup').style.display = 'block';
+    }
+    function closeReceipt() {
+      document.getElementById('receiptPopup').style.display = 'none';
+      order = [];
+      updateOrder();
+      document.getElementById('welcomeScreen').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
